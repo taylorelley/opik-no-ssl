@@ -1,6 +1,7 @@
 package com.comet.opik.infrastructure.llm;
 
 import com.google.common.io.Files;
+import com.comet.opik.infrastructure.http.InsecureTlsConfig;
 import lombok.experimental.UtilityClass;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -32,7 +33,7 @@ public class VideoMimeTypeUtils {
      * Shared HTTP client for HEAD requests.
      * Thread-safe and reusable across all calls.
      */
-    private static final HttpClient HTTP_CLIENT = HttpClient.newBuilder()
+    private static final HttpClient HTTP_CLIENT = InsecureTlsConfig.applyInsecureTls(HttpClient.newBuilder())
             .connectTimeout(Duration.ofMillis(HEAD_REQUEST_TIMEOUT_MS))
             .followRedirects(HttpClient.Redirect.NORMAL)
             .build();

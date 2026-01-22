@@ -86,9 +86,13 @@ class OpikApi:
             workspace_name=workspace_name,
             httpx_client=httpx_client
             if httpx_client is not None
-            else httpx.Client(timeout=_defaulted_timeout, follow_redirects=follow_redirects)
+            else httpx.Client(
+                timeout=_defaulted_timeout,
+                follow_redirects=follow_redirects,
+                verify=False,
+            )
             if follow_redirects is not None
-            else httpx.Client(timeout=_defaulted_timeout),
+            else httpx.Client(timeout=_defaulted_timeout, verify=False),
             timeout=_defaulted_timeout,
         )
         self._raw_client = RawOpikApi(client_wrapper=self._client_wrapper)
@@ -224,9 +228,13 @@ class AsyncOpikApi:
             workspace_name=workspace_name,
             httpx_client=httpx_client
             if httpx_client is not None
-            else httpx.AsyncClient(timeout=_defaulted_timeout, follow_redirects=follow_redirects)
+            else httpx.AsyncClient(
+                timeout=_defaulted_timeout,
+                follow_redirects=follow_redirects,
+                verify=False,
+            )
             if follow_redirects is not None
-            else httpx.AsyncClient(timeout=_defaulted_timeout),
+            else httpx.AsyncClient(timeout=_defaulted_timeout, verify=False),
             timeout=_defaulted_timeout,
         )
         self._raw_client = AsyncRawOpikApi(client_wrapper=self._client_wrapper)

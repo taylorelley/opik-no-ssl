@@ -6,6 +6,7 @@ from fastapi.responses import StreamingResponse, JSONResponse
 from typing import AsyncGenerator, Dict, Callable, Any
 import json
 import logging
+import httpx
 from openai import AsyncOpenAI, APIError, APIConnectionError, APITimeoutError
 import time
 from rich.logging import RichHandler
@@ -138,10 +139,16 @@ def create_app(llm_server_host: str) -> FastAPI:
     )
 
     # Create OpenAI client
+    http_client = httpx.AsyncClient(verify=False)
     client = AsyncOpenAI(
         base_url=f"{llm_server_host}/v1",
         api_key="<empty>",  # required but unused
+        http_client=http_client,
     )
+
+    @app.on_event("shutdown")
+    async def shutdown_http_client() -> None:
+        await http_client.aclose()
 
     @app.post("/v1/chat/completions", response_model=None)
     async def chat_completions(request: Request) -> Any:

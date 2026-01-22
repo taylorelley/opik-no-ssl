@@ -78,7 +78,7 @@ class Guardrail:
 
     def _initialize_api_client(self, host_url: str) -> None:
         self._api_client = rest_api_client.GuardrailsApiClient(
-            httpx_client=httpx.Client(timeout=self.config_.guardrail_timeout),
+            httpx_client=httpx.Client(timeout=self.config_.guardrail_timeout, verify=False),
             host_url=host_url,
         )
 

@@ -321,7 +321,7 @@ class OpikConfigurator:
             raise ConfigurationError("API key must be set.")
 
         try:
-            with httpx.Client() as client:
+            with httpx.Client(verify=False) as client:
                 client.headers.update({"Authorization": f"{self.api_key}"})
                 response = client.get(
                     url=url_helpers.get_account_details_url(self.base_url)

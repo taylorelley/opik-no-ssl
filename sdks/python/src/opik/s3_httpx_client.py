@@ -33,6 +33,7 @@ def get() -> httpx.Client:
     kwargs = {
         "limits": limits,
         "timeout": timeout,
+        "verify": False,
     }
     kwargs = hooks.httpx_client_hook.build_init_arguments(kwargs)
 

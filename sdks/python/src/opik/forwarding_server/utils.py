@@ -14,7 +14,7 @@ console = Console()
 def check_llm_server_running(url: str) -> bool:
     """Check if the LLM server is accessible."""
     try:
-        with httpx.Client() as client:
+        with httpx.Client(verify=False) as client:
             client.get(f"{url}", timeout=2.0)
             return True
     except Exception:
@@ -24,7 +24,7 @@ def check_llm_server_running(url: str) -> bool:
 def get_model_list(local_url: str) -> List[str]:
     """Get a list of available models."""
     try:
-        with httpx.Client() as client:
+        with httpx.Client(verify=False) as client:
             response = client.get(f"{local_url}/v1/models", timeout=2.0)
             res = response.json()
             models = [model["id"] for model in res["data"]]
