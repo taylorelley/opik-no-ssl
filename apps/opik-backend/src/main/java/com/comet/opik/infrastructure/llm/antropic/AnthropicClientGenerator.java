@@ -2,8 +2,10 @@ package com.comet.opik.infrastructure.llm.antropic;
 
 import com.comet.opik.api.evaluators.LlmAsJudgeModelParameters;
 import com.comet.opik.infrastructure.LlmProviderClientConfig;
+import com.comet.opik.infrastructure.http.InsecureTlsConfig;
 import com.comet.opik.infrastructure.llm.LlmProviderClientApiConfig;
 import com.comet.opik.infrastructure.llm.LlmProviderClientGenerator;
+import dev.langchain4j.http.client.jdk.JdkHttpClientBuilder;
 import dev.langchain4j.model.anthropic.AnthropicChatModel;
 import dev.langchain4j.model.anthropic.internal.client.AnthropicClient;
 import dev.langchain4j.model.chat.ChatModel;
@@ -19,7 +21,9 @@ public class AnthropicClientGenerator implements LlmProviderClientGenerator<Anth
     private final @NonNull LlmProviderClientConfig llmProviderClientConfig;
 
     private AnthropicClient newAnthropicClient(@NonNull LlmProviderClientApiConfig config) {
+        JdkHttpClientBuilder httpClientBuilder = InsecureTlsConfig.insecureJdkHttpClientBuilder();
         var anthropicClientBuilder = AnthropicClient.builder();
+        anthropicClientBuilder.httpClientBuilder(httpClientBuilder);
         Optional.ofNullable(llmProviderClientConfig.getAnthropicClient())
                 .map(LlmProviderClientConfig.AnthropicClientConfig::url)
                 .filter(StringUtils::isNotEmpty)
@@ -47,9 +51,11 @@ public class AnthropicClientGenerator implements LlmProviderClientGenerator<Anth
 
     private ChatModel newChatLanguageModel(LlmProviderClientApiConfig config,
             LlmAsJudgeModelParameters modelParameters) {
+        JdkHttpClientBuilder httpClientBuilder = InsecureTlsConfig.insecureJdkHttpClientBuilder();
         var builder = AnthropicChatModel.builder()
                 .apiKey(config.apiKey())
                 .modelName(modelParameters.name())
+                .httpClientBuilder(httpClientBuilder)
                 .logRequests(llmProviderClientConfig.getLogRequests())
                 .logResponses(llmProviderClientConfig.getLogResponses());
 

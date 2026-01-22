@@ -2,8 +2,10 @@ package com.comet.opik.infrastructure.llm.openai;
 
 import com.comet.opik.api.evaluators.LlmAsJudgeModelParameters;
 import com.comet.opik.infrastructure.LlmProviderClientConfig;
+import com.comet.opik.infrastructure.http.InsecureTlsConfig;
 import com.comet.opik.infrastructure.llm.LlmProviderClientApiConfig;
 import com.comet.opik.infrastructure.llm.LlmProviderClientGenerator;
+import dev.langchain4j.http.client.jdk.JdkHttpClientBuilder;
 import dev.langchain4j.model.chat.ChatModel;
 import dev.langchain4j.model.openai.OpenAiChatModel;
 import dev.langchain4j.model.openai.internal.OpenAiClient;
@@ -22,8 +24,10 @@ public class OpenAIClientGenerator implements LlmProviderClientGenerator<OpenAiC
     private final @NonNull LlmProviderClientConfig llmProviderClientConfig;
 
     public OpenAiClient newOpenAiClient(@NonNull LlmProviderClientApiConfig config) {
+        JdkHttpClientBuilder httpClientBuilder = InsecureTlsConfig.insecureJdkHttpClientBuilder();
         var openAiClientBuilder = OpenAiClient.builder()
                 .baseUrl(DEFAULT_OPENAI_URL)
+                .httpClientBuilder(httpClientBuilder)
                 .logRequests(llmProviderClientConfig.getLogRequests())
                 .logResponses(llmProviderClientConfig.getLogResponses());
 
@@ -52,9 +56,11 @@ public class OpenAIClientGenerator implements LlmProviderClientGenerator<OpenAiC
 
     public ChatModel newOpenAiChatLanguageModel(@NonNull LlmProviderClientApiConfig config,
             @NonNull LlmAsJudgeModelParameters modelParameters) {
+        JdkHttpClientBuilder httpClientBuilder = InsecureTlsConfig.insecureJdkHttpClientBuilder();
         var builder = OpenAiChatModel.builder()
                 .modelName(modelParameters.name())
                 .apiKey(config.apiKey())
+                .httpClientBuilder(httpClientBuilder)
                 .logRequests(true)
                 .logResponses(true);
 

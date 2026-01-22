@@ -64,6 +64,7 @@ def authenticate_if_needed():
             json={"email": email, "plainTextPassword": password},
             headers={"Content-Type": "application/json"},
             timeout=30,
+            verify=False,
         )
 
         if response.status_code != 200:

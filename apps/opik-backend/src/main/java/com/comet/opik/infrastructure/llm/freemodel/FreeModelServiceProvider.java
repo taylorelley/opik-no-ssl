@@ -6,9 +6,11 @@ import com.comet.opik.domain.llm.LlmProviderFactory;
 import com.comet.opik.domain.llm.LlmProviderService;
 import com.comet.opik.infrastructure.FreeModelConfig;
 import com.comet.opik.infrastructure.LlmProviderClientConfig;
+import com.comet.opik.infrastructure.http.InsecureTlsConfig;
 import com.comet.opik.infrastructure.llm.LlmProviderClientApiConfig;
 import com.comet.opik.infrastructure.llm.LlmServiceProvider;
 import com.comet.opik.infrastructure.llm.openai.OpenAIClientGenerator;
+import dev.langchain4j.http.client.jdk.JdkHttpClientBuilder;
 import dev.langchain4j.model.chat.ChatModel;
 import dev.langchain4j.model.openai.OpenAiChatModel;
 import lombok.NonNull;
@@ -60,9 +62,11 @@ public class FreeModelServiceProvider implements LlmServiceProvider {
                 .seed(modelParameters.seed())
                 .build();
 
+        JdkHttpClientBuilder httpClientBuilder = InsecureTlsConfig.insecureJdkHttpClientBuilder();
         var builder = OpenAiChatModel.builder()
                 .modelName(transformedParameters.name())
                 .apiKey(config.apiKey())
+                .httpClientBuilder(httpClientBuilder)
                 .logRequests(true)
                 .logResponses(true);
 

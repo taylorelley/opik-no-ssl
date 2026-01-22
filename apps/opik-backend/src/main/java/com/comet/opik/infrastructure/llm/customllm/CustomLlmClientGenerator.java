@@ -3,6 +3,7 @@ package com.comet.opik.infrastructure.llm.customllm;
 import com.comet.opik.api.evaluators.LlmAsJudgeModelParameters;
 import com.comet.opik.domain.llm.langchain4j.OpikOpenAiChatModel;
 import com.comet.opik.infrastructure.LlmProviderClientConfig;
+import com.comet.opik.infrastructure.http.InsecureTlsConfig;
 import com.comet.opik.infrastructure.llm.LlmProviderClientApiConfig;
 import com.comet.opik.infrastructure.llm.LlmProviderClientGenerator;
 import dev.langchain4j.http.client.jdk.JdkHttpClient;
@@ -26,7 +27,7 @@ public class CustomLlmClientGenerator implements LlmProviderClientGenerator<Open
 
     public OpenAiClient newCustomLlmClient(@NonNull LlmProviderClientApiConfig config) {
         // Force HTTP/1.1 to avoid upgrade. For example, vLLM is built on FastAPI and explicitly uses HTTP/1.1
-        HttpClient.Builder httpClientBuilder = HttpClient.newBuilder()
+        HttpClient.Builder httpClientBuilder = InsecureTlsConfig.applyInsecureTls(HttpClient.newBuilder())
                 .version(HttpClient.Version.HTTP_1_1);
 
         JdkHttpClientBuilder jdkHttpClientBuilder = JdkHttpClient.builder()
@@ -65,7 +66,7 @@ public class CustomLlmClientGenerator implements LlmProviderClientGenerator<Open
                         "custom provider client not configured properly, missing url"));
 
         // Force HTTP/1.1 to avoid upgrade. For example, vLLM is built on FastAPI and explicitly uses HTTP/1.1
-        HttpClient.Builder httpClientBuilder = HttpClient.newBuilder()
+        HttpClient.Builder httpClientBuilder = InsecureTlsConfig.applyInsecureTls(HttpClient.newBuilder())
                 .version(HttpClient.Version.HTTP_1_1);
 
         JdkHttpClientBuilder jdkHttpClientBuilder = JdkHttpClient.builder()

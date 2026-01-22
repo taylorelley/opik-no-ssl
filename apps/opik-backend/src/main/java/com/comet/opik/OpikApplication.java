@@ -15,6 +15,7 @@ import com.comet.opik.infrastructure.db.IdGeneratorModule;
 import com.comet.opik.infrastructure.db.NameGeneratorModule;
 import com.comet.opik.infrastructure.events.EventListenerRegistrar;
 import com.comet.opik.infrastructure.events.EventModule;
+import com.comet.opik.infrastructure.http.InsecureTlsConfig;
 import com.comet.opik.infrastructure.http.HttpModule;
 import com.comet.opik.infrastructure.job.JobGuiceyInstaller;
 import com.comet.opik.infrastructure.job.JobModule;
@@ -107,6 +108,7 @@ public class OpikApplication extends Application<OpikConfiguration> {
 
     @Override
     public void run(OpikConfiguration configuration, Environment environment) {
+        InsecureTlsConfig.disableSslVerificationGlobally();
         EncryptionUtils.setConfig(configuration);
 
         // Resources
