@@ -166,6 +166,9 @@ services:
       dockerfile: Dockerfile
       args:
         OPIK_VERSION: ${OPIK_VERSION:-latest}
+        AMAZON_LINUX_CA_CERT_B64: ${AMAZON_LINUX_CA_CERT_B64:-}
+        YUM_SSL_VERIFY: ${YUM_SSL_VERIFY:-true}
+        CURL_INSECURE: ${CURL_INSECURE:-false}
     hostname: backend
     command: ["bash", "-c", "./run_db_migrations.sh && ./entrypoint.sh"]
     environment:

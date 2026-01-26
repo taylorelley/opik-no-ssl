@@ -10,6 +10,17 @@ Scripts in this folder are meant to be run from the repository base folder. Exam
 
 ## Scripts list
 
+### `fetch_ssl_inspection_root_ca.sh`
+
+Use this script to extract the root CA certificate installed by SSL inspection appliances and add it to your
+system trust store. This is useful when Docker builds or downloads fail due to TLS interception.
+
+Example:
+
+```bash
+sudo ./scripts/fetch_ssl_inspection_root_ca.sh truststore.pki.rds.amazonaws.com
+```
+
 ### `generate_openapi.sh`
 
 Use this script to generate an updated OpenAPI specification file for the documentation application and the SDKs,
