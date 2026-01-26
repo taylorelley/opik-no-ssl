@@ -237,6 +237,9 @@ services:
     build:
       context: ../../apps/opik-python-backend
       dockerfile: Dockerfile
+      args:
+        ALPINE_MIRROR: ${ALPINE_MIRROR:-https://dl-cdn.alpinelinux.org/alpine}
+        APK_CA_CERT_B64: ${APK_CA_CERT_B64:-}
     hostname: python-backend
     privileged: true
     environment:
@@ -299,6 +302,9 @@ services:
     build:
       context: ../../apps/opik-python-backend
       dockerfile: Dockerfile
+      args:
+        ALPINE_MIRROR: ${ALPINE_MIRROR:-https://dl-cdn.alpinelinux.org/alpine}
+        APK_CA_CERT_B64: ${APK_CA_CERT_B64:-}
     hostname: demo-data-generator
     environment:
       <<: *ssl_env
