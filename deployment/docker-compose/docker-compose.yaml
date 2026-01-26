@@ -166,6 +166,7 @@ services:
       dockerfile: Dockerfile
       args:
         OPIK_VERSION: ${OPIK_VERSION:-latest}
+        SPOTLESS_SKIP: ${SPOTLESS_SKIP:-true}
         AMAZON_LINUX_CA_CERT_B64: ${AMAZON_LINUX_CA_CERT_B64:-}
         YUM_SSL_VERIFY: ${YUM_SSL_VERIFY:-true}
         CURL_INSECURE: ${CURL_INSECURE:-false}
