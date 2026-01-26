@@ -146,6 +146,34 @@ The Opik installation scripts now support service profiles for different develop
 
 Use the `--help` or `--info` options to troubleshoot issues. Dockerfiles now ensure containers run as non-root users for enhanced security. Once all is up and running, you can now visit [localhost:5173](http://localhost:5173) on your browser! For detailed instructions, see the [Local Deployment Guide](https://www.comet.com/docs/opik/self-host/local_deployment?from=llm&utm_source=opik&utm_medium=github&utm_content=self_host_link&utm_campaign=opik).
 
+##### SSL inspection environments (custom root CA)
+
+If your network uses SSL interception, install the inspection root CA on the host and pass it into builds. This
+prevents `yum`/`curl` failures while building images.
+
+1. Extract and install the interception root CA:
+
+   ```bash
+   sudo ./scripts/fetch_ssl_inspection_root_ca.sh truststore.pki.rds.amazonaws.com
+   ```
+
+2. Point the runtime containers at your CA bundle (this already matches the `./certs/custom-ca.pem` mount used by
+   docker compose):
+
+   ```bash
+   cp /usr/local/share/ca-certificates/truststore.pki.rds.amazonaws.com-custom-ca.crt ./certs/custom-ca.pem
+   ```
+
+3. Export build-time variables before running `./opik.sh --build`:
+
+   ```bash
+   export AMAZON_LINUX_CA_CERT_B64="$(base64 -w0 ./certs/custom-ca.pem)"
+   export YUM_SSL_VERIFY=true
+   export CURL_INSECURE=false
+   ```
+
+If you must disable verification temporarily, set `YUM_SSL_VERIFY=false` or `CURL_INSECURE=true`.
+
 #### Self-Hosting with Kubernetes & Helm (for Scalable Deployments)
 
 For production or larger-scale self-hosted deployments, Opik can be installed on a Kubernetes cluster using our Helm chart. Click the badge for the full [Kubernetes Installation Guide using Helm](https://www.comet.com/docs/opik/self-host/kubernetes/#kubernetes-installation?from=llm&utm_source=opik&utm_medium=github&utm_content=kubernetes_link&utm_campaign=opik).

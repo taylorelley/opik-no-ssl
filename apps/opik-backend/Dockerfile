@@ -2,6 +2,13 @@ FROM maven:3.9.11-amazoncorretto-21-al2023 AS build
 
 WORKDIR /opt/opik-backend
 
+# Optional custom CA for SSL inspection environments
+ARG AMAZON_LINUX_CA_CERT_B64=""
+RUN if [ -n "$AMAZON_LINUX_CA_CERT_B64" ]; then \
+        echo "$AMAZON_LINUX_CA_CERT_B64" | base64 -d > /etc/pki/ca-trust/source/anchors/opik-custom-ca.crt; \
+        update-ca-trust; \
+    fi
+
 # Copy parent POM first for dependency caching
 COPY pom.xml spotless.xml ./
 RUN mvn dependency:go-offline
@@ -34,15 +41,30 @@ LABEL org.opencontainers.image.vendor="Comet ML"
 # Install dependencies, download and verify AWS RDS certificate bundle
 # SHA256 checksum must match the official AWS RDS global bundle
 # Update this checksum when AWS updates the bundle: https://truststore.pki.rds.amazonaws.com/global/global-bundle.pem
+ARG AMAZON_LINUX_CA_CERT_B64=""
+ARG YUM_SSL_VERIFY=true
+ARG CURL_INSECURE=false
 ARG RDS_CERT_SHA256=e5bb2084ccf45087bda1c9bffdea0eb15ee67f0b91646106e466714f9de3c7e3
 ARG STORE_PASSWORD=changeit
 COPY install_rds_cert.sh /tmp/install_rds_cert.sh
-RUN yum update -y && \
+RUN if [ -n "$AMAZON_LINUX_CA_CERT_B64" ]; then \
+        echo "$AMAZON_LINUX_CA_CERT_B64" | base64 -d > /etc/pki/ca-trust/source/anchors/opik-custom-ca.crt; \
+        update-ca-trust; \
+    fi && \
+    if [ "$YUM_SSL_VERIFY" = "0" ] || [ "$YUM_SSL_VERIFY" = "false" ]; then \
+        printf "\nsslverify=0\n" >> /etc/dnf/dnf.conf; \
+        printf "\nsslverify=0\n" >> /etc/yum.conf; \
+    fi && \
+    yum update -y && \
     yum install -y --allowerasing shadow ca-certificates openssl perl dos2unix curl && \
     yum clean all && \
     rm -rf /var/cache/yum && \
     mkdir -p /tmp/certs && \
-    curl -fsSL -o /tmp/certs/global-bundle.pem https://truststore.pki.rds.amazonaws.com/global/global-bundle.pem && \
+    curl_opts="-fsSL" && \
+    if [ "$CURL_INSECURE" = "true" ] || [ "$CURL_INSECURE" = "1" ]; then \
+        curl_opts="${curl_opts}k"; \
+    fi && \
+    curl ${curl_opts} -o /tmp/certs/global-bundle.pem https://truststore.pki.rds.amazonaws.com/global/global-bundle.pem && \
     echo "${RDS_CERT_SHA256}  /tmp/certs/global-bundle.pem" | sha256sum -c - && \
     dos2unix /tmp/install_rds_cert.sh && \
     chmod 700 /tmp/install_rds_cert.sh && \
