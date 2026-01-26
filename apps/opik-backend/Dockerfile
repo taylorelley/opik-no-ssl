@@ -23,12 +23,13 @@ COPY opik-telemetry-extension ./opik-telemetry-extension
 
 # Build both artifacts
 ARG OPIK_VERSION
+ARG SPOTLESS_SKIP=true
 ENV MAVEN_OPTS="-Xmx1G -XX:MaxMetaspaceSize=265m"
 RUN mvn versions:set -DnewVersion=${OPIK_VERSION} && \
-    mvn clean package -DskipTests && \
+    mvn clean package -DskipTests -Dspotless.skip=${SPOTLESS_SKIP} && \
     cd opik-telemetry-extension && \
     mvn versions:set -DnewVersion=${OPIK_VERSION} && \
-    mvn clean package -DskipTests
+    mvn clean package -DskipTests -Dspotless.skip=${SPOTLESS_SKIP}
 
 ###############################
 FROM amazoncorretto:21.0.8-al2023
